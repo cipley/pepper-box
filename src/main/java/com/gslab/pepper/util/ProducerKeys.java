@@ -50,7 +50,15 @@ public class ProducerKeys {
 
     public static final String KERBEROS_ENABLED = "kerberos.auth.enabled";
 
-    public static final String KERBEROS_ENABLED_DEFULAT = "NO";
+    public static final String KERBEROS_ENABLED_DEFAULT = "NO";
     public static final String FLAG_YES = "YES";
 
+    public static final String CONFLUENT_KAFKA_ENABLED = "use.confluent.kafka";
+    public static final String CONFLUENT_KAFKA_ENABLED_DEFAULT = "NO";
+    public static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
+    public static final String SCHEMA_REGISTRY_URL_DEFAULT = "<Schema Registry Default>";
+    public static final String AUTO_REGISTER_SCHEMAS = "auto.register.schemas";
+    public static final String AUTO_REGISTER_SCHEMAS_DEFAULT = "true";
+    public static final String USE_LATEST_VERSION = "use.latest.version";
+    public static final String USE_LATEST_VERSION_DEFAULT = "true";
 }

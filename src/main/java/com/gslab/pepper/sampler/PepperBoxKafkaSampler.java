@@ -5,6 +5,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.gslab.pepper.util.ProducerKeys;
 import com.gslab.pepper.util.PropsKeys;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -69,10 +70,17 @@ public class PepperBoxKafkaSampler extends AbstractJavaSamplerClient {
         defaultParameters.addArgument(ProducerConfig.RECEIVE_BUFFER_CONFIG, ProducerKeys.RECEIVE_BUFFER_CONFIG_DEFAULT);
         defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
         defaultParameters.addArgument(PropsKeys.MESSAGE_PLACEHOLDER_KEY, PropsKeys.MSG_PLACEHOLDER);
-        defaultParameters.addArgument(ProducerKeys.KERBEROS_ENABLED, ProducerKeys.KERBEROS_ENABLED_DEFULAT);
+        defaultParameters.addArgument(ProducerKeys.KERBEROS_ENABLED, ProducerKeys.KERBEROS_ENABLED_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.JAVA_SEC_AUTH_LOGIN_CONFIG, ProducerKeys.JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.JAVA_SEC_KRB5_CONFIG, ProducerKeys.JAVA_SEC_KRB5_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.SASL_KERBEROS_SERVICE_NAME, ProducerKeys.SASL_KERBEROS_SERVICE_NAME_DEFAULT);
+
+        //Confluent specific parameters
+        defaultParameters.addArgument(ProducerKeys.CONFLUENT_KAFKA_ENABLED, ProducerKeys.CONFLUENT_KAFKA_ENABLED_DEFAULT);
+        defaultParameters.addArgument(ProducerKeys.SCHEMA_REGISTRY_URL, ProducerKeys.SCHEMA_REGISTRY_URL_DEFAULT);
+        defaultParameters.addArgument(ProducerKeys.AUTO_REGISTER_SCHEMAS, ProducerKeys.AUTO_REGISTER_SCHEMAS_DEFAULT);
+        defaultParameters.addArgument(ProducerKeys.USE_LATEST_VERSION, ProducerKeys.USE_LATEST_VERSION_DEFAULT);
+
         return defaultParameters;
     }
 
@@ -109,6 +117,12 @@ public class PepperBoxKafkaSampler extends AbstractJavaSamplerClient {
             System.setProperty(ProducerKeys.JAVA_SEC_AUTH_LOGIN_CONFIG, context.getParameter(ProducerKeys.JAVA_SEC_AUTH_LOGIN_CONFIG));
             System.setProperty(ProducerKeys.JAVA_SEC_KRB5_CONFIG, context.getParameter(ProducerKeys.JAVA_SEC_KRB5_CONFIG));
             props.put(ProducerKeys.SASL_KERBEROS_SERVICE_NAME, context.getParameter(ProducerKeys.SASL_KERBEROS_SERVICE_NAME));
+        }
+        var confluentKafka = Boolean.getBoolean(context.getParameter(ProducerKeys.CONFLUENT_KAFKA_ENABLED));
+        if (confluentKafka) {
+            props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, context.getParameter(ProducerKeys.SCHEMA_REGISTRY_URL));
+            props.put(AbstractKafkaSchemaSerDeConfig.AUTO_REGISTER_SCHEMAS, Boolean.getBoolean(context.getParameter(ProducerKeys.AUTO_REGISTER_SCHEMAS)));
+            props.put(AbstractKafkaSchemaSerDeConfig.USE_LATEST_VERSION, Boolean.getBoolean(context.getParameter(ProducerKeys.USE_LATEST_VERSION)));
         }
 
         placeHolder = context.getParameter(PropsKeys.MESSAGE_PLACEHOLDER_KEY);
