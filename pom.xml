@@ -117,6 +117,12 @@
         <version>20140107</version>
         <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka_2.11</artifactId>
+        <version>2.4.1</version>
+        <scope>compile</scope>
+    </dependency>
 
 
 </dependencies>
