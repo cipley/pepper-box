@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>pepper-box</groupId>
-    <artifactId>pepper-box</artifactId>
+    <artifactId>pepper-box-java21</artifactId>
     <version>1.0</version>
     <properties>
         <jmeter.version>5.6.3</jmeter.version>
         <kafka.version>3.9.0</kafka.version>
-        <kafka211.version>2.4.1</kafka211.version>
+        <kafka211.version>0.9.0.1</kafka211.version>
         <zookeeper.version>3.8.4</zookeeper.version>
         <confluent.version>7.7.1</confluent.version>
         <jdk.version>21</jdk.version>
@@ -123,28 +123,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.11</artifactId>
-            <version>0.9.0.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20140107</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.11</artifactId>
-            <version>2.4.1</version>
-            <scope>compile</scope>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>4.2.29</version>
+            <scope>test</scope>
         </dependency>
 
 

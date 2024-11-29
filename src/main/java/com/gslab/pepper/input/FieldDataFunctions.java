@@ -31,7 +31,7 @@ public class FieldDataFunctions {
     private static SplittableRandom random = new SplittableRandom();
 
     //Random timestamp between two dates with input format
-    private static final String DEFAULT_INPUT_FORMAT = "dd-MM-yyyy HH:mm:ss";
+    private static final String DEFAULT_INPUT_FORMAT = "dd-MM-yyyy HH:mm:ssZ";
 
     //List of pre-defined first name set
     private static String FIRST_NAMES[] = null;

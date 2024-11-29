@@ -1,7 +1,7 @@
 package com.gslab.pepper.test;
 
 import com.gslab.pepper.model.FieldExpressionMapping;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +50,8 @@ public class TestInputUtils {
         fieldExpressionMapping.setFieldName("messageId");
         fieldExpressionMapping.setFieldExpression("SEQUENCE(\"messageId\", 1, 1)");
 
-        Assert.assertNotNull(fieldExpressionMapping.getFieldName());
-        Assert.assertNotNull(fieldExpressionMapping.getFieldExpression());
+        Assertions.assertNotNull(fieldExpressionMapping.getFieldName());
+        Assertions.assertNotNull(fieldExpressionMapping.getFieldExpression());
 
         FieldExpressionMapping fieldExpressionMapping1 = new FieldExpressionMapping();
         fieldExpressionMapping1.setFieldName("messageBody");

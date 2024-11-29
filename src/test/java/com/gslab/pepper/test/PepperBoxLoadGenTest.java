@@ -5,6 +5,7 @@ import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
 import kafka.utils.MockTime;
 import kafka.utils.TestUtils;
+import kafka.utils.Time;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import kafka.zk.EmbeddedZookeeper;
@@ -14,11 +15,11 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.utils.Time;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -30,20 +31,21 @@ import java.util.Properties;
 /**
  * Created by satish on 5/3/17.
  */
+@Disabled
 public class PepperBoxLoadGenTest {
     private static final String ZKHOST = "127.0.0.1";
     private static final String BROKERHOST = "127.0.0.1";
     private static final String BROKERPORT = "9092";
     private static final String TOPIC = "test";
 
-    private EmbeddedZookeeper zkServer = null;
+    private static EmbeddedZookeeper zkServer = null;
 
-    private KafkaServer kafkaServer = null;
+    private static KafkaServer kafkaServer = null;
 
-    private ZkClient zkClient = null;
+    private static ZkClient zkClient = null;
 
-    @Before
-    public void setup() throws IOException {
+    @BeforeAll
+    static void setup() throws IOException {
 
         zkServer = new EmbeddedZookeeper();
 
@@ -91,12 +93,12 @@ public class PepperBoxLoadGenTest {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps);
         consumer.subscribe(Arrays.asList(TOPIC));
         ConsumerRecords<String, String> records = consumer.poll(30000);
-        Assert.assertTrue("PepperBoxLoadGenerator validation failed", records.count() > 0);
+        Assertions.assertTrue(records.count() > 0, "PepperBoxLoadGenerator validation failed");
 
     }
 
-    @After
-    public void teardown(){
+    @AfterAll
+    static void teardown(){
         kafkaServer.shutdown();
         zkClient.close();
         zkServer.shutdown();

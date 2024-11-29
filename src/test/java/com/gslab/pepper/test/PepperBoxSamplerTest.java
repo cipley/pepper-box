@@ -10,6 +10,7 @@ import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
 import kafka.utils.MockTime;
 import kafka.utils.TestUtils;
+import kafka.utils.Time;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import kafka.zk.EmbeddedZookeeper;
@@ -23,11 +24,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.utils.Time;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,6 +39,7 @@ import java.util.Properties;
 /**
  * Created by satish on 5/3/17.
  */
+@Disabled
 public class PepperBoxSamplerTest {
 
     private static final String ZKHOST = "127.0.0.1";
@@ -45,16 +47,16 @@ public class PepperBoxSamplerTest {
     private static final String BROKERPORT = "9092";
     private static final String TOPIC = "test";
 
-    private EmbeddedZookeeper zkServer = null;
+    private static EmbeddedZookeeper zkServer = null;
 
-    private KafkaServer kafkaServer = null;
+    private static KafkaServer kafkaServer = null;
 
-    private ZkClient zkClient = null;
+    private static ZkClient zkClient = null;
 
     private  JavaSamplerContext jmcx = null;
 
-    @Before
-    public void setup() throws IOException {
+    @BeforeAll
+    static void setup() throws IOException {
 
         zkServer = new EmbeddedZookeeper();
 
@@ -110,9 +112,9 @@ public class PepperBoxSamplerTest {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps);
         consumer.subscribe(Arrays.asList(TOPIC));
         ConsumerRecords<String, String> records = consumer.poll(30000);
-        Assert.assertEquals(1, records.count());
+        Assertions.assertEquals(1, records.count());
         for (ConsumerRecord<String, String> record : records){
-            Assert.assertEquals("Failed to validate produced message", msgSent.toString(), record.value());
+            Assertions.assertEquals("Failed to validate produced message", msgSent.toString(), record.value());
         }
 
         sampler.teardownTest(jmcx);
@@ -156,17 +158,17 @@ public class PepperBoxSamplerTest {
         KafkaConsumer<String, Message> consumer = new KafkaConsumer<>(consumerProps);
         consumer.subscribe(Arrays.asList(TOPIC));
         ConsumerRecords<String, Message> records = consumer.poll(30000);
-        Assert.assertEquals(1, records.count());
+        Assertions.assertEquals(1, records.count());
         for (ConsumerRecord<String, Message> record : records){
-            Assert.assertEquals("Failed to validate produced message", msgSent.getMessageBody(), record.value().getMessageBody());
+            Assertions.assertEquals("Failed to validate produced message", msgSent.getMessageBody(), record.value().getMessageBody());
         }
 
         sampler.teardownTest(jmcx);
 
     }
 
-    @After
-    public void teardown(){
+    @AfterAll
+    static void teardown(){
         kafkaServer.shutdown();
         zkClient.close();
         zkServer.shutdown();

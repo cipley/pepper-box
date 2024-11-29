@@ -12,9 +12,10 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.beans.PropertyDescriptor;
 import java.util.Iterator;
@@ -26,8 +27,8 @@ import java.util.ResourceBundle;
  */
 public class PepperBoxConfigElementTest {
 
-    @BeforeClass
-    public static void setUp(){
+    @BeforeAll
+    static void setUp(){
         JMeterContext jmcx = JMeterContextService.getContext();
         jmcx.setVariables(new JMeterVariables());
     }
@@ -41,20 +42,24 @@ public class PepperBoxConfigElementTest {
         plainTextConfigElement.iterationStart(null);
         Object object = JMeterContextService.getContext().getVariables().getObject(PropsKeys.MSG_PLACEHOLDER);
         JSONObject jsonObject = new JSONObject(object.toString());
-        Assert.assertTrue("Failed to run config element", (Integer)jsonObject.get("messageId") > 0);
+        Assertions.assertTrue((Integer)jsonObject.get("messageId") > 0, "Failed to run config element");
 
     }
 
-    @Test(expected = ClassFormatError.class)
+    @Test
+//    @Test(expected = ClassFormatError.class)
     public void plainTextExceptionTest(){
 
         PlainTextConfigElement plainTextConfigElement = new PlainTextConfigElement();
         plainTextConfigElement.setJsonSchema(TestInputUtils.defectSchema);
         plainTextConfigElement.setPlaceHolder(PropsKeys.MSG_PLACEHOLDER);
         JMeterContextService.getContext().getVariables().remove(PropsKeys.MSG_PLACEHOLDER);
-        plainTextConfigElement.iterationStart(null);
-        Object object = JMeterContextService.getContext().getVariables().getObject(PropsKeys.MSG_PLACEHOLDER);
-        Assert.assertNull("Failed to run config element", object);
+        Assertions.assertThrows(ClassFormatError.class, () -> {
+            plainTextConfigElement.iterationStart(null);
+            JMeterContextService.getContext().getVariables().getObject(PropsKeys.MSG_PLACEHOLDER);
+        });
+//        Object object = JMeterContextService.getContext().getVariables().getObject(PropsKeys.MSG_PLACEHOLDER);
+//        Assert.assertNull("Failed to run config element", object);
 
     }
 
@@ -69,7 +74,7 @@ public class PepperBoxConfigElementTest {
         JMeterContextService.getContext().getVariables().remove(PropsKeys.MSG_PLACEHOLDER);
         serializedConfigElement.iterationStart(null);
         Message message = (Message)JMeterContextService.getContext().getVariables().getObject(PropsKeys.MSG_PLACEHOLDER);
-        Assert.assertEquals("Failed to run config element","Test Message", message.getMessageBody());
+        Assertions.assertEquals("Test Message", message.getMessageBody(), "Failed to run config element");
 
     }
 
@@ -83,7 +88,7 @@ public class PepperBoxConfigElementTest {
         JMeterContextService.getContext().getVariables().remove(PropsKeys.MSG_PLACEHOLDER);
         serializedConfigElement.iterationStart(null);
         Message message = (Message)JMeterContextService.getContext().getVariables().getObject(PropsKeys.MSG_PLACEHOLDER);
-        Assert.assertNull("Failed to run config element", message);
+        Assertions.assertNull(message, "Failed to run config element");
 
     }
 
@@ -93,29 +98,32 @@ public class PepperBoxConfigElementTest {
         try {
 
             SchemaProcessor schemaProcessor = new SchemaProcessor();
-            Assert.assertTrue("Failed to generate Iterator from input schema", schemaProcessor.getPlainTextMessageIterator(TestInputUtils.testSchema) instanceof Iterator);
+            Assertions.assertTrue(schemaProcessor.getPlainTextMessageIterator(TestInputUtils.testSchema) instanceof Iterator, "Failed to generate Iterator from input schema");
 
         } catch (Exception e) {
-            Assert.assertTrue("Failed to generate Iterator from input schema : " + e.getMessage(), false);
+            Assertions.assertTrue( false, "Failed to generate Iterator from input schema : " + e.getMessage());
         }
     }
 
 
-    @Test(expected = Exception.class)
+    @Test
+//    @Test(expected = Exception.class)
     public void validateClassPropertyEditor(){
+        Assertions.assertThrows(Exception.class, () -> {
             ResourceBundle.getBundle(PlainTextConfigElement.class.getName());
             PlainTextConfigElementBeanInfo pbeanInfo = new PlainTextConfigElementBeanInfo();
-            Assert.assertTrue("Failed to validate serialized property descriptors", pbeanInfo.getPropertyDescriptors().length == 3);
+            Assertions.assertEquals(3, pbeanInfo.getPropertyDescriptors().length, "Failed to validate serialized property descriptors");
 
             ResourceBundle.getBundle(SerializedConfigElement.class.getName());
             SerializedConfigElementBeanInfo sbeanInfo = new SerializedConfigElementBeanInfo();
-            Assert.assertTrue("Failed to validate serialized property descriptors", sbeanInfo.getPropertyDescriptors().length == 3);
+            Assertions.assertEquals(3, sbeanInfo.getPropertyDescriptors().length, "Failed to validate serialized property descriptors");
 
             PropertyDescriptor propertyDescriptor = sbeanInfo.getPropertyDescriptors()[1];
             ClassPropertyEditor classPropertyEditor = new ClassPropertyEditor(propertyDescriptor);
             classPropertyEditor.setValue("com.gslab.pepper.test.Message");
             classPropertyEditor.actionPerformed(null);
-            Assert.assertEquals("Failed to validate serialized property descriptors", "com.gslab.pepper.test.Message", classPropertyEditor.getValue());
+            Assertions.assertEquals("com.gslab.pepper.test.Message", classPropertyEditor.getValue(), "Failed to validate serialized property descriptors");
+        });
     }
 
 }
