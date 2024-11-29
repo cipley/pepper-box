@@ -6,7 +6,6 @@ import com.gslab.pepper.loadgen.BaseLoadGenerator;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
-import javax.swing.*;
 import java.util.Iterator;
 /**
  * The PlaintTextLoadGenerator is custom load generator class gets invoked from iteratorStart of PlainTextConfigElement class

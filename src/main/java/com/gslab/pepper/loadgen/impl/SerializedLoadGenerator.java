@@ -1,13 +1,12 @@
 package com.gslab.pepper.loadgen.impl;
 
 import com.gslab.pepper.exception.PepperBoxException;
-import com.gslab.pepper.model.FieldExpressionMapping;
 import com.gslab.pepper.input.SchemaProcessor;
 import com.gslab.pepper.loadgen.BaseLoadGenerator;
+import com.gslab.pepper.model.FieldExpressionMapping;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
-import javax.swing.*;
 import java.util.Iterator;
 import java.util.List;
 /**

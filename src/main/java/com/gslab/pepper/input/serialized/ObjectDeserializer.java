@@ -1,6 +1,7 @@
 package com.gslab.pepper.input.serialized;
 
 import org.apache.kafka.common.serialization.Deserializer;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;

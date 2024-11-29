@@ -1,13 +1,18 @@
 package com.gslab.pepper.input;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-
 import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.SplittableRandom;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -58,10 +63,11 @@ public class FieldDataFunctions {
     public static long TIMESTAMP(String beginDate, String endDate) {
 
         try {
+            var beginDateInstant = Instant.from(DateTimeFormatter.ofPattern(DEFAULT_INPUT_FORMAT).parse(beginDate));
+            long beginDateTimestamp = beginDateInstant.toEpochMilli();
 
-            long beginDateTimestamp = DateTimeFormat.forPattern(DEFAULT_INPUT_FORMAT).parseDateTime(beginDate).getMillis();
-
-            long endDateTimestamp = DateTimeFormat.forPattern(DEFAULT_INPUT_FORMAT).parseDateTime(endDate).getMillis();
+            var endDateInstant = Instant.from(DateTimeFormatter.ofPattern(DEFAULT_INPUT_FORMAT).parse(endDate));
+            long endDateTimestamp = endDateInstant.toEpochMilli();
 
             long randomTimestamp = random.nextLong(endDateTimestamp - beginDateTimestamp) + beginDateTimestamp;
 
@@ -85,7 +91,8 @@ public class FieldDataFunctions {
 
         try {
 
-           return DateTime.now().toString(format);
+           return LocalDateTime.now()
+                   .format(DateTimeFormatter.ofPattern(format));
 
         } catch (Exception e) {
             log.log(Level.SEVERE, "Failed to parse current date", e);
