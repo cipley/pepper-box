@@ -3,9 +3,12 @@ package com.gslab.pepper.sampler;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import com.google.protobuf.Struct;
+import com.google.protobuf.util.JsonFormat;
 import com.gslab.pepper.util.ProducerKeys;
 import com.gslab.pepper.util.PropsKeys;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -44,8 +47,12 @@ public class PepperBoxKafkaSampler extends AbstractJavaSamplerClient {
 
     //Message placeholder key
     private String placeHolder;
+    //Serializer
+
+    private String serializer;
 
     private static final Logger log = LoggingManager.getLoggerForClass();
+
 
     /**
      * Set default parameters and their values
@@ -118,16 +125,19 @@ public class PepperBoxKafkaSampler extends AbstractJavaSamplerClient {
             System.setProperty(ProducerKeys.JAVA_SEC_KRB5_CONFIG, context.getParameter(ProducerKeys.JAVA_SEC_KRB5_CONFIG));
             props.put(ProducerKeys.SASL_KERBEROS_SERVICE_NAME, context.getParameter(ProducerKeys.SASL_KERBEROS_SERVICE_NAME));
         }
-        var confluentKafka = Boolean.getBoolean(context.getParameter(ProducerKeys.CONFLUENT_KAFKA_ENABLED));
-        if (confluentKafka) {
+        var confluentKafka = context.getParameter(ProducerKeys.CONFLUENT_KAFKA_ENABLED);
+        if (confluentKafka != null && confluentKafka.equals(ProducerKeys.FLAG_YES)) {
             props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, context.getParameter(ProducerKeys.SCHEMA_REGISTRY_URL));
-            props.put(AbstractKafkaSchemaSerDeConfig.AUTO_REGISTER_SCHEMAS, Boolean.getBoolean(context.getParameter(ProducerKeys.AUTO_REGISTER_SCHEMAS)));
-            props.put(AbstractKafkaSchemaSerDeConfig.USE_LATEST_VERSION, Boolean.getBoolean(context.getParameter(ProducerKeys.USE_LATEST_VERSION)));
+            props.put(AbstractKafkaSchemaSerDeConfig.AUTO_REGISTER_SCHEMAS, "true");
+//            props.put(AbstractKafkaSchemaSerDeConfig.AUTO_REGISTER_SCHEMAS, Boolean.getBoolean(context.getParameter(ProducerKeys.AUTO_REGISTER_SCHEMAS)));
+            props.put(AbstractKafkaSchemaSerDeConfig.USE_LATEST_VERSION, "true");
+//            props.put(AbstractKafkaSchemaSerDeConfig.USE_LATEST_VERSION, Boolean.getBoolean(context.getParameter(ProducerKeys.USE_LATEST_VERSION)));
         }
 
         placeHolder = context.getParameter(PropsKeys.MESSAGE_PLACEHOLDER_KEY);
         topic = context.getParameter(ProducerKeys.KAFKA_TOPIC_CONFIG);
         producer = new KafkaProducer<String, Object>(props);
+        serializer = context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG);
 
     }
 
@@ -143,9 +153,20 @@ public class PepperBoxKafkaSampler extends AbstractJavaSamplerClient {
 
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
-        Object message = JMeterContextService.getContext().getVariables().getObject(placeHolder);
+        String originalMessage = JMeterContextService.getContext().getVariables().getObject(placeHolder).toString();
 
         try {
+            Object message;
+            //Check value to determine message format
+            if (Class.forName(serializer).equals(KafkaProtobufSerializer.class)) {
+                Struct.Builder builder = Struct.newBuilder();
+                JsonFormat.parser()
+                        .ignoringUnknownFields()
+                        .merge(originalMessage, builder);
+                message = builder.build();
+            } else {
+                message = originalMessage;
+            }
 
             ProducerRecord<String, Object> producerRecord = new ProducerRecord<String, Object>(topic, message);
             producer.send(producerRecord);
